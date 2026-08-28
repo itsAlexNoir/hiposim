@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="public/hiposim-mark.svg" width="96" alt="HipoSim" />
+</p>
+
 # HipoSim
 
 **Simulador de hipotecas y de compra de vivienda en Salamanca**, Castilla y León. Desktop app para Windows y macOS — explora hipotecas, calcula el coste real de comprar una casa (impuestos, notaría, registro, tasación), y compara precios frente a metros cuadrados por barrio, todo en un panel denso pensado para analizar, no solo para mirar.
