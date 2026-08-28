@@ -1,0 +1,25 @@
+name: CI
+
+# Fast feedback on every push/PR: typecheck, engine test suite, and a
+# frontend-only build. Does not compile the Rust/Tauri shell — that only
+# happens in release.yml, on tag push, where native installers matter.
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+          cache: npm
+
+      - run: npm ci
+      - run: npx tsc --noEmit
+      - run: npm test
+      - run: npx vite build

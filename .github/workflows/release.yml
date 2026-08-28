@@ -1,0 +1,75 @@
+name: Release
+
+# Builds native installers on every version tag (v1.0.0, v1.1.0, ...) and
+# attaches them to a draft GitHub Release: a Windows .msi/.exe (NSIS) and
+# macOS .dmg for both Apple Silicon and Intel. macOS/Windows installers can
+# only be produced on their own OS regardless of toolchain, which is why
+# this runs on hosted macos-latest/windows-latest runners rather than
+# locally — see the plan's "Distribution" note.
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+jobs:
+  release:
+    permissions:
+      contents: write
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: macos-latest
+            args: "--target aarch64-apple-darwin"
+          - platform: macos-latest
+            args: "--target x86_64-apple-darwin"
+          - platform: windows-latest
+            args: ""
+
+    runs-on: ${{ matrix.platform }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+
+      - name: Install Node dependencies
+        run: npm ci
+
+      - name: Run engine tests
+        run: npm test
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.platform == 'macos-latest' && 'aarch64-apple-darwin,x86_64-apple-darwin' || '' }}
+
+      - uses: swatinem/rust-cache@v2
+        with:
+          workspaces: "./src-tauri -> target"
+
+      - uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Set these repo secrets to produce signed, non-Gatekeeper-blocked
+          # macOS builds and auto-updater signatures. Unsigned builds still
+          # work — see the plan's caveats on first-launch warnings.
+          # APPLE_CERTIFICATE, APPLE_CERTIFICATE_PASSWORD, APPLE_SIGNING_IDENTITY,
+          # APPLE_ID, APPLE_PASSWORD, APPLE_TEAM_ID
+          # TAURI_SIGNING_PRIVATE_KEY, TAURI_SIGNING_PRIVATE_KEY_PASSWORD
+        with:
+          tagName: ${{ github.ref_name }}
+          releaseName: "HipoSim ${{ github.ref_name }}"
+          releaseBody: |
+            Simulador de hipotecas y compra de vivienda en Salamanca.
+
+            Ver el historial de cambios (commits) para el detalle de esta versión.
+
+            **macOS**: si aparece un aviso de Gatekeeper al primer inicio, haz clic derecho
+            sobre la app → Abrir. Los binarios no están firmados con un certificado de
+            desarrollador de Apple.
+            **Windows**: SmartScreen puede avisar por el mismo motivo (binario sin firmar).
+          releaseDraft: true
+          prerelease: false
+          args: ${{ matrix.args }}
