@@ -71,7 +71,7 @@ type PersistedState = Pick<
 export const useAppStore = create<AppState>()(
   persist(
     (set) => ({
-      activeTab: "panel",
+      activeTab: "inicio",
       setActiveTab: (tab) => set({ activeTab: tab }),
 
       condicionesComprador: CONDICIONES_COMPRADOR_INICIAL,
@@ -110,8 +110,25 @@ export const useAppStore = create<AppState>()(
     }),
     {
       name: "hiposim-state",
-      version: 1,
+      version: 2,
       storage: createJSONStorage(() => persistStorage),
+      // v1 -> v2: ViviendaCandidata.metrosCuadrados split into metrosUtiles +
+      // metrosConstruidos. Old data only had one figure — treat it as the
+      // construidos value (what €/m² was always computed against) and
+      // estimate útiles at the typical ~85% coefficient.
+      migrate: (persisted, version) => {
+        const p = persisted as { viviendas?: Array<Record<string, unknown>> } | null;
+        if (version >= 2 || !p?.viviendas) return persisted as PersistedState;
+        return {
+          ...p,
+          viviendas: p.viviendas.map((v) => {
+            if (typeof v.metrosConstruidos === "number") return v;
+            const metrosConstruidos = typeof v.metrosCuadrados === "number" ? v.metrosCuadrados : 0;
+            const { metrosCuadrados: _drop, ...rest } = v;
+            return { ...rest, metrosConstruidos, metrosUtiles: Math.round(metrosConstruidos * 0.85) };
+          }),
+        } as unknown as PersistedState;
+      },
       partialize: (s): PersistedState => ({
         condicionesComprador: s.condicionesComprador,
         viviendas: s.viviendas,

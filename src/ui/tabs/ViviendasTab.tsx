@@ -30,8 +30,8 @@ export function ViviendasTab() {
   return (
     <div className="flex flex-col gap-4">
       <Card
-        title="Comparador de viviendas"
-        subtitle="Precio frente a metros cuadrados, contrastado con el precio de referencia del barrio"
+        title="Viviendas candidatas"
+        subtitle={`${viviendas.length} viviendas`}
         action={
           <div className="flex gap-2">
             <button
@@ -39,7 +39,8 @@ export function ViviendasTab() {
                 addVivienda({
                   nombre: "Nueva vivienda",
                   precio: 200_000,
-                  metrosCuadrados: 80,
+                  metrosUtiles: 68,
+                  metrosConstruidos: 80,
                   barrioId: null,
                   tipoVivienda: "segundaMano",
                   municipioRural: false,
@@ -78,15 +79,11 @@ export function ViviendasTab() {
           </div>
         }
       >
-        <PriceScatter viviendas={viviendas} />
-      </Card>
-
-      <Card title="Viviendas candidatas" subtitle={`${viviendas.length} viviendas`}>
         <div className="overflow-auto rounded border" style={{ borderColor: "var(--border)" }}>
           <table className="w-full text-xs">
             <thead>
               <tr style={{ background: "var(--surface-raised)" }}>
-                {["", "Nombre", "Precio", "m²", "€/m²", "Barrio", "Δ barrio", "Tipo", "Rural", ""].map((h, i) => (
+                {["", "Nombre", "Precio", "m² útiles", "m² construidos", "€/m²", "Barrio", "Δ barrio", "Tipo", "Rural", ""].map((h, i) => (
                   <th
                     key={i}
                     className="border-b px-2 py-2 text-left text-xs font-medium"
@@ -136,9 +133,19 @@ export function ViviendasTab() {
                       type="number"
                       className={cellInputClass}
                       style={{ color: "var(--text)" }}
-                      value={v.metrosCuadrados}
+                      value={v.metrosUtiles}
                       step={1}
-                      onChange={(e) => updateVivienda(v.id, { metrosCuadrados: e.target.valueAsNumber || 0 })}
+                      onChange={(e) => updateVivienda(v.id, { metrosUtiles: e.target.valueAsNumber || 0 })}
+                    />
+                  </td>
+                  <td className="px-1 py-1">
+                    <input
+                      type="number"
+                      className={cellInputClass}
+                      style={{ color: "var(--text)" }}
+                      value={v.metrosConstruidos}
+                      step={1}
+                      onChange={(e) => updateVivienda(v.id, { metrosConstruidos: e.target.valueAsNumber || 0 })}
                     />
                   </td>
                   <td className="px-2 py-1 text-right" style={{ color: "var(--text-secondary)" }}>
@@ -206,7 +213,7 @@ export function ViviendasTab() {
               ))}
               {viviendas.length === 0 && (
                 <tr>
-                  <td colSpan={10} className="px-2 py-6 text-center" style={{ color: "var(--text-muted)" }}>
+                  <td colSpan={11} className="px-2 py-6 text-center" style={{ color: "var(--text-muted)" }}>
                     No hay viviendas todavía — añade una o importa un CSV.
                   </td>
                 </tr>
@@ -214,6 +221,13 @@ export function ViviendasTab() {
             </tbody>
           </table>
         </div>
+      </Card>
+
+      <Card
+        title="Comparador de viviendas"
+        subtitle="Precio frente a metros construidos, contrastado con el precio de referencia del barrio"
+      >
+        <PriceScatter viviendas={viviendas} />
       </Card>
     </div>
   );

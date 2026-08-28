@@ -44,7 +44,7 @@ function CustomTooltip({ active, payload }: any) {
         {d.nombre}
       </div>
       <div style={{ color: "var(--text-secondary)" }}>
-        {formatM2(d.x)} · {formatEUR(d.y)} · {formatEurPerM2(d.precioM2)}
+        {formatM2(d.x)} construidos ({formatM2(d.metrosUtiles)} útiles) · {formatEUR(d.y)} · {formatEurPerM2(d.precioM2)}
       </div>
       {d.barrioNombre && (
         <div style={{ color: "var(--text-muted)" }}>
@@ -65,9 +65,17 @@ function CustomTooltip({ active, payload }: any) {
 export function PriceScatter({ viviendas }: { viviendas: ViviendaCandidata[] }) {
   const data = viviendas.map((v) => {
     const barrio = v.barrioId ? SALAMANCA_BARRIOS.find((b) => b.id === v.barrioId) : undefined;
-    const precioM2 = v.precio / v.metrosCuadrados;
+    const precioM2 = v.precio / v.metrosConstruidos;
     const diferenciaPct = barrio ? (precioM2 - barrio.precioVentaM2) / barrio.precioVentaM2 : null;
-    return { nombre: v.nombre, x: v.metrosCuadrados, y: v.precio, precioM2, barrioNombre: barrio?.nombre ?? null, diferenciaPct };
+    return {
+      nombre: v.nombre,
+      x: v.metrosConstruidos,
+      metrosUtiles: v.metrosUtiles,
+      y: v.precio,
+      precioM2,
+      barrioNombre: barrio?.nombre ?? null,
+      diferenciaPct,
+    };
   });
 
   const maxM2 = Math.max(...data.map((d) => d.x), 50) * 1.15;
@@ -90,13 +98,19 @@ export function PriceScatter({ viviendas }: { viviendas: ViviendaCandidata[] }) 
         <XAxis
           type="number"
           dataKey="x"
-          name="Superficie"
+          name="Superficie construida"
           domain={[0, maxM2]}
           tickFormatter={(v) => `${Math.round(v)} m²`}
           tick={{ fill: "var(--text-muted)", fontSize: 11 }}
           tickLine={false}
           axisLine={{ stroke: "var(--border-strong)" }}
-          label={{ value: "m²", position: "insideBottom", offset: -14, fill: "var(--text-muted)", fontSize: 11 }}
+          label={{
+            value: "m² construidos",
+            position: "insideBottom",
+            offset: -14,
+            fill: "var(--text-muted)",
+            fontSize: 11,
+          }}
         />
         <YAxis
           type="number"

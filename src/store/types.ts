@@ -15,7 +15,9 @@ export interface ViviendaCandidata {
   id: string;
   nombre: string;
   precio: number;
-  metrosCuadrados: number;
+  metrosUtiles: number;
+  /** Superficie construida — la base sobre la que se calcula el €/m² (convención habitual del mercado inmobiliario). */
+  metrosConstruidos: number;
   /** Links to a src/data/salamanca.ts barrio, or null for a house outside the seeded list. */
   barrioId: string | null;
   valorReferencia?: number;
@@ -76,4 +78,4 @@ export interface EscenariosConfig {
   ahorroMensualDisponible: number;
 }
 
-export type TabId = "panel" | "hipoteca" | "compra" | "viviendas" | "escenarios";
+export type TabId = "inicio" | "panel" | "viviendas" | "compra" | "hipoteca" | "escenarios";

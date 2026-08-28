@@ -1,23 +1,26 @@
 import { useAppStore } from "@/store/useAppStore";
 import { Nav } from "@/ui/components/Nav";
 import { ViviendaSwitcher } from "@/ui/components/ViviendaSwitcher";
+import { WelcomeTab } from "@/ui/tabs/WelcomeTab";
 import { PanelTab } from "@/ui/tabs/PanelTab";
-import { HipotecaTab } from "@/ui/tabs/HipotecaTab";
-import { CompraTab } from "@/ui/tabs/CompraTab";
 import { ViviendasTab } from "@/ui/tabs/ViviendasTab";
+import { CompraTab } from "@/ui/tabs/CompraTab";
+import { HipotecaTab } from "@/ui/tabs/HipotecaTab";
 import { EscenariosTab } from "@/ui/tabs/EscenariosTab";
 
 function TabContent() {
   const activeTab = useAppStore((s) => s.activeTab);
   switch (activeTab) {
+    case "inicio":
+      return <WelcomeTab />;
     case "panel":
       return <PanelTab />;
-    case "hipoteca":
-      return <HipotecaTab />;
-    case "compra":
-      return <CompraTab />;
     case "viviendas":
       return <ViviendasTab />;
+    case "compra":
+      return <CompraTab />;
+    case "hipoteca":
+      return <HipotecaTab />;
     case "escenarios":
       return <EscenariosTab />;
   }

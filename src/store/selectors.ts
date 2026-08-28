@@ -47,7 +47,7 @@ export function useViviendaActiva(): ViviendaCandidata | null {
 }
 
 export function benchmarkVivienda(v: ViviendaCandidata): BenchmarkBarrio {
-  const precioM2 = calcularPrecioM2(v.precio, v.metrosCuadrados);
+  const precioM2 = calcularPrecioM2(v.precio, v.metrosConstruidos);
   const barrio = v.barrioId ? getBarrioById(v.barrioId) : undefined;
   return compararConBarrio(precioM2, barrio?.precioVentaM2 ?? null);
 }

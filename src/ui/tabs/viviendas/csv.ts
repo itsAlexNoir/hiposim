@@ -1,6 +1,15 @@
 import type { TipoVivienda, ViviendaCandidata } from "@/store/types";
 
-const COLUMNS = ["nombre", "precio", "metrosCuadrados", "barrioId", "tipoVivienda", "municipioRural", "valorReferencia"];
+const COLUMNS = [
+  "nombre",
+  "precio",
+  "metrosUtiles",
+  "metrosConstruidos",
+  "barrioId",
+  "tipoVivienda",
+  "municipioRural",
+  "valorReferencia",
+];
 
 function csvEscape(v: string): string {
   if (/[",\n]/.test(v)) return `"${v.replace(/"/g, '""')}"`;
@@ -12,7 +21,8 @@ export function viviendasToCsv(viviendas: ViviendaCandidata[]): string {
     [
       v.nombre,
       String(v.precio),
-      String(v.metrosCuadrados),
+      String(v.metrosUtiles),
+      String(v.metrosConstruidos),
       v.barrioId ?? "",
       v.tipoVivienda,
       String(v.municipioRural),
@@ -54,7 +64,7 @@ function parseCsvLine(line: string): string[] {
   return out;
 }
 
-/** Parses a CSV in the shape viviendasToCsv produces. Skips rows missing a valid precio/metrosCuadrados. */
+/** Parses a CSV in the shape viviendasToCsv produces. Skips rows missing a valid precio/metrosConstruidos. */
 export function csvToViviendas(text: string): Omit<ViviendaCandidata, "id">[] {
   const lines = text.split(/\r?\n/).filter((l) => l.trim().length > 0);
   if (lines.length < 2) return [];
@@ -65,8 +75,16 @@ export function csvToViviendas(text: string): Omit<ViviendaCandidata, "id">[] {
   for (let i = 1; i < lines.length; i++) {
     const cols = parseCsvLine(lines[i]);
     const precio = Number(cols[idx("precio")]);
-    const metrosCuadrados = Number(cols[idx("metrosCuadrados")]);
-    if (!Number.isFinite(precio) || precio <= 0 || !Number.isFinite(metrosCuadrados) || metrosCuadrados <= 0) {
+    const metrosConstruidos = Number(cols[idx("metrosConstruidos")]);
+    const metrosUtiles = Number(cols[idx("metrosUtiles")]);
+    if (
+      !Number.isFinite(precio) ||
+      precio <= 0 ||
+      !Number.isFinite(metrosConstruidos) ||
+      metrosConstruidos <= 0 ||
+      !Number.isFinite(metrosUtiles) ||
+      metrosUtiles <= 0
+    ) {
       continue;
     }
     const barrioIdRaw = cols[idx("barrioId")];
@@ -76,7 +94,8 @@ export function csvToViviendas(text: string): Omit<ViviendaCandidata, "id">[] {
     result.push({
       nombre: cols[idx("nombre")] || "Sin nombre",
       precio,
-      metrosCuadrados,
+      metrosUtiles,
+      metrosConstruidos,
       barrioId: barrioIdRaw || null,
       tipoVivienda: (cols[idx("tipoVivienda")] === "obraNueva" ? "obraNueva" : "segundaMano") as TipoVivienda,
       municipioRural: cols[idx("municipioRural")] === "true",

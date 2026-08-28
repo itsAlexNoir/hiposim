@@ -2,10 +2,11 @@ import { useAppStore } from "@/store/useAppStore";
 import type { TabId } from "@/store/types";
 
 const TABS: { id: TabId; label: string }[] = [
+  { id: "inicio", label: "Inicio" },
   { id: "panel", label: "Panel" },
-  { id: "hipoteca", label: "Hipoteca" },
-  { id: "compra", label: "Compra" },
   { id: "viviendas", label: "Viviendas" },
+  { id: "compra", label: "Compra" },
+  { id: "hipoteca", label: "Hipoteca" },
   { id: "escenarios", label: "Escenarios" },
 ];
 
