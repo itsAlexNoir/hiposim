@@ -1,6 +1,6 @@
 [package]
 name = "hiposim"
-version = "0.2.0"
+version = "0.3.0"
 description = "Simulador de hipotecas y compra de vivienda"
 authors = ["you"]
 edition = "2021"
