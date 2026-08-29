@@ -158,12 +158,12 @@ npm run tauri dev
 
 ## Firma de código y notarización
 
-Sin firmar, los instaladores funcionan pero disparan avisos del sistema operativo la primera vez que se abren:
+`src-tauri/tauri.conf.json` aplica firma **ad-hoc** en macOS por defecto (`bundle.macOS.signingIdentity: "-"`) — gratis, sin cuenta de Apple Developer. Esto es necesario porque en Apple Silicon el sistema exige que todo ejecutable tenga *alguna* firma para poder arrancar; sin ella, una copia descargada (con el atributo de cuarentena `com.apple.quarantine` que macOS añade automáticamente) no muestra el aviso normal de Gatekeeper, sino **"la app está dañada y no se puede abrir... muévela a la papelera"**. La firma ad-hoc evita ese mensaje, pero no evita todos los avisos:
 
 - **macOS**: Gatekeeper bloquea la app ("no se puede abrir porque su desarrollador no pudo verificarse"). El usuario debe hacer clic derecho sobre la app → **Abrir**, y confirmar — solo la primera vez.
 - **Windows**: SmartScreen muestra "Windows protegió tu PC". El usuario pulsa **Más información** → **Ejecutar de todas formas**.
 
-Para builds firmados (sin esos avisos), añade estos **secrets** en GitHub → Settings → Secrets and variables → Actions. `release.yml` ya está preparado para recogerlos automáticamente si existen:
+Para eliminar también ese aviso (firma real de Developer ID + notarización, en vez de solo ad-hoc), añade estos **secrets** en GitHub → Settings → Secrets and variables → Actions. `release.yml` ya está preparado para recogerlos automáticamente si existen:
 
 ### macOS (requiere cuenta de Apple Developer, ~99 USD/año)
 
@@ -224,7 +224,13 @@ sudo xcode-select --switch /Library/Developer/CommandLineTools
 ```
 
 **El `.dmg`/`.app` se abre pero macOS dice que está "dañado" o "no se puede abrir"**
-Build sin firmar. Es esperado (ver [Firma de código](#firma-de-código-y-notarización)) — clic derecho → Abrir, en vez de doble clic.
+Con la firma ad-hoc (ver [Firma de código](#firma-de-código-y-notarización)) esto no debería volver a ocurrir en builds nuevos. Si aparece de todas formas — por ejemplo con una copia ya descargada antes de este cambio, o si el `.app` sigue en cuarentena — el clic derecho → Abrir **no** lo arregla (ese atajo solo sirve para el aviso distinto de "no se pudo verificar el desarrollador"). La solución es quitar el atributo de cuarentena a mano:
+```bash
+xattr -cr /Applications/HipoSim.app
+```
+
+**El `.dmg`/`.app` muestra "no se puede abrir porque su desarrollador no pudo verificarse"**
+Este es el aviso normal de Gatekeeper para apps firmadas ad-hoc (no con certificado de Developer ID). Clic derecho sobre la app → **Abrir**, y confirmar — solo hace falta la primera vez.
 
 **`npm run tauri build` compila pero no encuentro el instalador**
 Revisa `src-tauri/target/release/bundle/` — cada formato tiene su propia subcarpeta (`msi/`, `nsis/`, `dmg/`, `macos/`). El bloque `bundle.targets: "all"` de `src-tauri/tauri.conf.json` genera todos los formatos soportados por el sistema operativo actual.

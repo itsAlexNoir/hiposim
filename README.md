@@ -139,4 +139,4 @@ Documentación más detallada de la arquitectura del motor y el patrón store/se
 ## Limitaciones conocidas
 
 - **Compilación nativa en esta máquina de desarrollo**: si tu Linux carece de `webkit2gtk`/`libdbus-1-dev`, `npm run tauri dev` no compilará el shell nativo — es una carencia de bibliotecas de sistema Linux, no del código, y no afecta a Windows ni macOS (backends nativos completamente distintos, sin dependencia de dbus/gtk). Ver [docs/BUILDING.md](docs/BUILDING.md#linux-como-entorno-de-desarrollo).
-- Sin firma de código por defecto: macOS mostrará un aviso de Gatekeeper y Windows uno de SmartScreen la primera vez, salvo que configures certificados de firma (ver `docs/BUILDING.md`).
+- Firma de código ad-hoc por defecto (macOS), sin certificado de Developer ID ni notarización: macOS mostrará un aviso de Gatekeeper ("no se pudo verificar el desarrollador") y Windows uno de SmartScreen la primera vez, salvo que configures certificados de firma real (ver `docs/BUILDING.md`).
