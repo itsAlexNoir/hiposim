@@ -1,5 +1,5 @@
 import { useRef } from "react";
-import { SALAMANCA_BARRIOS } from "@/data/salamanca";
+import { SALAMANCA_AREA_METROPOLITANA, SALAMANCA_BARRIOS } from "@/data/salamanca";
 import { useAppStore } from "@/store/useAppStore";
 import { useViviendasConBenchmark } from "@/store/selectors";
 import { Card } from "@/ui/components/Card";
@@ -125,7 +125,8 @@ export function ViviendasTab() {
                       style={{ color: "var(--text)" }}
                       value={v.precio}
                       step={1000}
-                      onChange={(e) => updateVivienda(v.id, { precio: e.target.valueAsNumber || 0 })}
+                      min={0}
+                      onChange={(e) => updateVivienda(v.id, { precio: Math.max(0, e.target.valueAsNumber || 0) })}
                     />
                   </td>
                   <td className="px-1 py-1">
@@ -135,7 +136,10 @@ export function ViviendasTab() {
                       style={{ color: "var(--text)" }}
                       value={v.metrosUtiles}
                       step={1}
-                      onChange={(e) => updateVivienda(v.id, { metrosUtiles: e.target.valueAsNumber || 0 })}
+                      min={0}
+                      onChange={(e) =>
+                        updateVivienda(v.id, { metrosUtiles: Math.max(0, e.target.valueAsNumber || 0) })
+                      }
                     />
                   </td>
                   <td className="px-1 py-1">
@@ -145,7 +149,10 @@ export function ViviendasTab() {
                       style={{ color: "var(--text)" }}
                       value={v.metrosConstruidos}
                       step={1}
-                      onChange={(e) => updateVivienda(v.id, { metrosConstruidos: e.target.valueAsNumber || 0 })}
+                      min={0}
+                      onChange={(e) =>
+                        updateVivienda(v.id, { metrosConstruidos: Math.max(0, e.target.valueAsNumber || 0) })
+                      }
                     />
                   </td>
                   <td className="px-2 py-1 text-right" style={{ color: "var(--text-secondary)" }}>
@@ -159,11 +166,20 @@ export function ViviendasTab() {
                       onChange={(e) => updateVivienda(v.id, { barrioId: e.target.value || null })}
                     >
                       <option value="">—</option>
-                      {SALAMANCA_BARRIOS.map((b) => (
-                        <option key={b.id} value={b.id}>
-                          {b.nombre}
-                        </option>
-                      ))}
+                      <optgroup label="Salamanca capital">
+                        {SALAMANCA_BARRIOS.map((b) => (
+                          <option key={b.id} value={b.id}>
+                            {b.nombre}
+                          </option>
+                        ))}
+                      </optgroup>
+                      <optgroup label="Área metropolitana">
+                        {SALAMANCA_AREA_METROPOLITANA.map((m) => (
+                          <option key={m.id} value={m.id}>
+                            {m.nombre}
+                          </option>
+                        ))}
+                      </optgroup>
                     </select>
                   </td>
                   <td

@@ -47,7 +47,11 @@ export function useViviendaActiva(): ViviendaCandidata | null {
 }
 
 export function benchmarkVivienda(v: ViviendaCandidata): BenchmarkBarrio {
-  const precioM2 = calcularPrecioM2(v.precio, v.metrosConstruidos);
+  // calcularPrecioM2 throws for metrosConstruidos <= 0 (by design — see its
+  // doc comment). This runs during render (useMemo below), so a stale or
+  // just-typed invalid value must never reach it: fall back to NaN, which
+  // the existing formatEurPerM2/formatPct helpers already render as "—".
+  const precioM2 = v.metrosConstruidos > 0 ? calcularPrecioM2(v.precio, v.metrosConstruidos) : NaN;
   const barrio = v.barrioId ? getBarrioById(v.barrioId) : undefined;
   return compararConBarrio(precioM2, barrio?.precioVentaM2 ?? null);
 }

@@ -18,8 +18,18 @@ export function HipotecaTab() {
           <StatTile label="Cuota mensual" value={formatEUR(solveResult.cuota, 2)} />
           <StatTile label="Importe prestado" value={formatEUR(solveResult.capital)} />
           <StatTile label="Plazo" value={formatMonths(solveResult.plazoMesesExacto)} />
-          <StatTile label="TIN" value={formatPct(solveResult.tipoAnual)} />
-          <StatTile label="TAE" value={tae?.ok ? formatPct(tae.tae) : "—"} sublabel="incluye comisiones y bonificaciones" />
+          <StatTile
+            label="TIN"
+            value={formatPct(solveResult.tipoAnual)}
+            sublabel="tipo nominal pactado"
+            title="TIN: el porcentaje que el banco añade al capital prestado. Es el tipo pactado en el contrato, pero no incluye comisiones ni el coste de las bonificaciones."
+          />
+          <StatTile
+            label="TAE"
+            value={tae?.ok ? formatPct(tae.tae) : "—"}
+            sublabel="incluye comisiones y bonificaciones"
+            title="TAE: coste anual real del préstamo. Parte del TIN y le suma la comisión de apertura, la tasación y el coste de mantener las bonificaciones — por eso la TAE es siempre ≥ TIN, y es la cifra correcta para comparar ofertas."
+          />
           <StatTile
             label="Coste total"
             value={schedule?.ok ? formatEUR(schedule.costeTotal) : formatEUR(solveResult.costeTotal)}
@@ -30,6 +40,24 @@ export function HipotecaTab() {
             }
           />
         </div>
+      )}
+
+      {solveResult.ok && tae?.ok && (
+        <p className="text-xs" style={{ color: "var(--text-muted)" }}>
+          El <strong>TIN</strong> ({formatPct(solveResult.tipoAnual)}) es solo el tipo de interés que el banco aplica al
+          capital; la <strong>TAE</strong> ({formatPct(tae.tae)}) traduce ese TIN al coste real anual, sumando comisión
+          de apertura, tasación y el coste de las bonificaciones exigidas. Por eso la TAE es la cifra que hay que
+          comparar entre bancos, nunca el TIN por sí solo (
+          <a
+            href="https://www.bancosantander.es/glosario/tin/"
+            target="_blank"
+            rel="noreferrer"
+            style={{ color: "var(--accent)" }}
+          >
+            definición de TIN — Banco Santander
+          </a>
+          ).
+        </p>
       )}
 
       <SolverForm />

@@ -6,8 +6,8 @@ import { Card } from "@/ui/components/Card";
 import { formatEUR, formatMonths, formatPct } from "@/ui/format";
 
 const SOLVE_FOR_OPTIONS: { value: SolveFor; label: string }[] = [
-  { value: "cuota", label: "Cuota mensual" },
   { value: "capital", label: "Importe a pedir" },
+  { value: "cuota", label: "Cuota mensual" },
   { value: "plazo", label: "Plazo" },
   { value: "tipo", label: "Tipo de interés" },
 ];

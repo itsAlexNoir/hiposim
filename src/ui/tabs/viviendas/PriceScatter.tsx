@@ -9,7 +9,7 @@ import {
   YAxis,
   ResponsiveContainer,
 } from "recharts";
-import { SALAMANCA_BARRIOS } from "@/data/salamanca";
+import { SALAMANCA_ZONAS } from "@/data/salamanca";
 import type { ViviendaCandidata } from "@/store/types";
 import { formatEUR, formatEurPerM2, formatM2 } from "@/ui/format";
 
@@ -64,7 +64,7 @@ function CustomTooltip({ active, payload }: any) {
 
 export function PriceScatter({ viviendas }: { viviendas: ViviendaCandidata[] }) {
   const data = viviendas.map((v) => {
-    const barrio = v.barrioId ? SALAMANCA_BARRIOS.find((b) => b.id === v.barrioId) : undefined;
+    const barrio = v.barrioId ? SALAMANCA_ZONAS.find((b) => b.id === v.barrioId) : undefined;
     const precioM2 = v.precio / v.metrosConstruidos;
     const diferenciaPct = barrio ? (precioM2 - barrio.precioVentaM2) / barrio.precioVentaM2 : null;
     return {
@@ -88,8 +88,8 @@ export function PriceScatter({ viviendas }: { viviendas: ViviendaCandidata[] }) 
     : null;
 
   const barriosPresentes = [...new Set(viviendas.map((v) => v.barrioId).filter(Boolean))]
-    .map((id) => SALAMANCA_BARRIOS.find((b) => b.id === id))
-    .filter((b): b is (typeof SALAMANCA_BARRIOS)[number] => Boolean(b));
+    .map((id) => SALAMANCA_ZONAS.find((b) => b.id === id))
+    .filter((b): b is (typeof SALAMANCA_ZONAS)[number] => Boolean(b));
 
   return (
     <ResponsiveContainer width="100%" height={360}>

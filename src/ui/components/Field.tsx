@@ -25,8 +25,15 @@ export function NumberField({
   disabled?: boolean;
 }) {
   const handle = (e: ChangeEvent<HTMLInputElement>) => {
-    const v = e.target.valueAsNumber;
-    if (!Number.isNaN(v)) onChange(v);
+    let v = e.target.valueAsNumber;
+    if (Number.isNaN(v)) return;
+    // min/max are also passed as HTML attributes below, but the browser
+    // only flags an out-of-range value as :invalid — it still fires
+    // onChange. Clamp here so a value like a negative "plazo" can never
+    // reach app state (and downstream math that assumes positive input).
+    if (min !== undefined) v = Math.max(min, v);
+    if (max !== undefined) v = Math.min(max, v);
+    onChange(v);
   };
   return (
     <label className="block text-xs">

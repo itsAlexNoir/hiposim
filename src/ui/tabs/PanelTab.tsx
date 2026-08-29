@@ -38,7 +38,12 @@ export function PanelTab() {
       {vivienda && solveResult.ok && (
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
           <StatTile label="Cuota mensual" value={formatEUR(solveResult.cuota, 2)} />
-          <StatTile label="TAE" value={tae?.ok ? formatPct(tae.tae) : "—"} />
+          <StatTile
+            label="TAE"
+            value={tae?.ok ? formatPct(tae.tae) : "—"}
+            sublabel={`vs. ${formatPct(solveResult.tipoAnual)} TIN`}
+            title="TAE: coste anual real del préstamo, calculado a partir del TIN más comisión de apertura, tasación y bonificaciones. Siempre es ≥ TIN — es la cifra correcta para comparar ofertas (ver pestaña Hipoteca)."
+          />
           <StatTile
             label="Coste total hipoteca"
             value={schedule?.ok ? formatEUR(schedule.costeTotal) : formatEUR(solveResult.costeTotal)}
@@ -105,11 +110,13 @@ export function PanelTab() {
               {viviendas.map((v) => {
                 const benchmark = benchmarkVivienda(v);
                 const capitalHipotetico = v.precio * perfilFinanciero.ltvMaximoPct;
-                const cuotaHipotetica = pmt(
-                  periodicRate(tipoAnualEfectivo(hipoteca), 12),
-                  hipoteca.plazoAniosInput * 12,
-                  capitalHipotetico,
-                );
+                // pmt() throws for plazoAniosInput <= 0 (by design). This runs
+                // during render, so guard it — a stale or just-typed invalid
+                // value must degrade to "—" (via formatEUR), not crash.
+                const cuotaHipotetica =
+                  hipoteca.plazoAniosInput > 0
+                    ? pmt(periodicRate(tipoAnualEfectivo(hipoteca), 12), hipoteca.plazoAniosInput * 12, capitalHipotetico)
+                    : NaN;
                 const condiciones = { ...condicionesComprador, municipioRural: v.municipioRural };
                 const resumen = calcularCostesCompra(
                   v.tipoVivienda,

@@ -12,14 +12,21 @@ export function StatTile({
   value,
   sublabel,
   status = "neutral",
+  title,
 }: {
   label: string;
   value: string;
   sublabel?: string;
   status?: Status;
+  /** Native hover tooltip (title attribute) — use to explain what the figure means or how it's derived. */
+  title?: string;
 }) {
   return (
-    <div className="rounded-lg border px-4 py-3" style={{ background: "var(--surface)", borderColor: "var(--border)" }}>
+    <div
+      className="rounded-lg border px-4 py-3"
+      style={{ background: "var(--surface)", borderColor: "var(--border)" }}
+      title={title}
+    >
       <div className="text-xs" style={{ color: "var(--text-muted)" }}>
         {label}
       </div>

@@ -1,4 +1,5 @@
 import { useAppStore } from "@/store/useAppStore";
+import { ErrorBoundary } from "@/ui/components/ErrorBoundary";
 import { Nav } from "@/ui/components/Nav";
 import { ViviendaSwitcher } from "@/ui/components/ViviendaSwitcher";
 import { WelcomeTab } from "@/ui/tabs/WelcomeTab";
@@ -27,6 +28,7 @@ function TabContent() {
 }
 
 function App() {
+  const activeTab = useAppStore((s) => s.activeTab);
   return (
     <div className="flex h-full flex-col" style={{ background: "var(--page)" }}>
       <header className="flex items-center justify-between border-b px-4 py-2" style={{ borderColor: "var(--border)" }}>
@@ -44,7 +46,10 @@ function App() {
         <Nav />
       </div>
       <main className="flex-1 overflow-auto p-4">
-        <TabContent />
+        {/* resetKey=activeTab: switching tabs recovers from a caught error without a full reload. */}
+        <ErrorBoundary resetKey={activeTab}>
+          <TabContent />
+        </ErrorBoundary>
       </main>
     </div>
   );
